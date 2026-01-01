@@ -1,0 +1,32 @@
+---
+const path = Astro.url.pathname;
+
+const nav = [
+  { href: "/resume", label: "Resume" },
+  { href: "/blog", label: "Blog" },
+  { href: "/readings", label: "Readings" },
+];
+
+const isActive = (href: string) =>
+  href === "/"
+    ? path === "/"
+    : path === href || path.startsWith(href + "/");
+---
+
+<header class="site-header">
+  <a class="brand" href="/" aria-current={path === "/" ? "page" : undefined}>
+    Andrew Pollack-Gray
+  </a>
+
+  <nav class="site-nav">
+    {nav.map((item) => (
+      <a
+        href={item.href}
+        aria-current={isActive(item.href) ? "page" : undefined}
+        class={isActive(item.href) ? "active" : undefined}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
+</header>

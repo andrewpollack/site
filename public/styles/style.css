@@ -1,0 +1,703 @@
+/* -------------------------
+   Theme tokens
+   ------------------------- */
+:root {
+  --background-color: #241C2A;
+
+  /* Text hierarchy */
+  --body-text: #E6E3EE;
+  --muted-text: #B9B4C6;
+  --accent: #C7B6FF;
+  --accent-strong: #9D7BFF;
+  --highlight-color: #E7A6FF;
+
+  /* Layout */
+  --font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --padding-main: 20px;
+  --section-spacing: 40px;
+  --content-width: 75ch;
+
+  /* Green → white ramp (tuned for dark code bg) */
+  --g0: rgba(242, 255, 250, 0.92); /* near-white mint (brightest) */
+  --g1: rgba(205, 255, 236, 0.90); /* very light mint */
+  --g2: rgba(150, 247, 203, 0.92); /* mint (main) */
+  --g3: rgba(110, 231, 183, 0.92); /* strong mint */
+  --g4: rgba(72, 214, 160, 0.92);  /* deepest green (still readable) */
+
+  --g-comment: rgba(205, 255, 236, 0.55); /* readable but clearly “comment” */
+
+  /* Code */
+  --code-mint: #6EE7B7;          /* commands / primary */
+  --code-blue: #9ECBFF;          /* flags / paths / params */
+  --code-lav:  #C7B6FF;          /* keywords / types */
+  --code-peach:#FFB4A1;          /* operators / punctuation / pipes */
+  --code-comment: rgba(230, 227, 238, 0.68);
+  --code-green: #6EE7B7;
+  --code-green-dim: rgba(110, 231, 183, 0.82);
+  --code-text: #CFFAE5;
+  --code-purple: #C7B6FF;
+  --code-blue: #A3D4FF;
+  --code-bg: #14101A;
+  --code-border: rgba(110, 231, 183, 0.22);
+  --code-accent: rgba(157, 123, 255, 0.80);
+}
+
+.site-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px var(--padding-main);
+}
+
+/* Brand + nav links: no native underline */
+.site-header .brand,
+.site-header .site-nav a,
+.site-header > a {
+  text-decoration: none !important;
+  position: relative;
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+/* Brand color */
+.site-header .brand {
+  color: rgba(242, 255, 250, 0.92);
+  font-weight: 900;
+}
+
+/* Pseudo underline (tight, controlled width) */
+.site-header .brand::after,
+.site-header .site-nav a::after,
+.site-header > a::after {
+  content: "";
+  position: absolute;
+  left: 10px;   /* match padding */
+  right: 10px;  /* match padding */
+  bottom: 4px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(199, 182, 255, 0.80);
+
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0.9;
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+/* Hover/focus shows underline without overshoot */
+.site-header .brand:hover::after,
+.site-header .brand:focus-visible::after,
+.site-header .site-nav a:hover::after,
+.site-header .site-nav a:focus-visible::after,
+.site-header > a:hover::after,
+.site-header > a:focus-visible::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Active page */
+.site-header a[aria-current="page"] {
+  background: rgba(199, 182, 255, 0.10);
+}
+
+.site-header a[aria-current="page"]::after {
+  transform: scaleX(1);
+  opacity: 1;
+  height: 3px;
+  background: rgba(199, 182, 255, 0.92);
+}
+
+/* Keep keyboard focus visible */
+.site-header a:focus-visible {
+  outline: 2px solid rgba(110, 231, 183, 0.45);
+  outline-offset: 2px;
+}
+
+
+
+/* -------------------------
+   Base layout
+   ------------------------- */
+html,
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--background-color);
+  color: var(--body-text);
+}
+
+body {
+  font-size: 16.5px;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Constrain reading width + keep centered */
+header,
+main,
+footer {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* -------------------------
+   Header / nav
+   ------------------------- */
+header {
+  position: relative;
+  padding: 14px var(--padding-main);
+  text-align: center; /* matches your current look */
+  color: rgba(185, 180, 198, 0.70);
+}
+
+/* Full-width divider line under header (not limited to 75ch) */
+header::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background: rgba(199, 182, 255, 0.14);
+  pointer-events: none;
+}
+
+header a {
+  font-weight: 800;
+  margin: 0 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+
+  transition: background 120ms ease, transform 120ms ease, color 120ms ease;
+}
+
+/* Make hover feel clearly interactive */
+header a:hover,
+header a:focus-visible {
+  background: rgba(199, 182, 255, 0.12);
+  color: rgba(242, 255, 250, 0.92); /* near-white so it pops */
+  transform: translateY(-1px);
+  text-decoration-thickness: 3px;
+}
+
+header a:hover {
+  box-shadow: 0 0 0 1px rgba(199, 182, 255, 0.20);
+}
+
+/* Keyboard focus ring */
+header a:focus-visible {
+  outline: 2px solid rgba(110, 231, 183, 0.45);
+  outline-offset: 2px;
+}
+
+/* -------------------------
+   Main / footer
+   ------------------------- */
+main {
+  padding: var(--padding-main);
+  padding-top: 28px;
+  flex: 1;
+  padding-bottom: 60px; /* room for footer */
+}
+
+footer {
+  text-align: center;
+  padding: 10px var(--padding-main);
+  height: 50px;
+  color: var(--muted-text);
+}
+
+/* -------------------------
+   Typography
+   ------------------------- */
+section {
+  margin-bottom: var(--section-spacing);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+h1 {
+  line-height: 1.2;
+}
+
+h2 {
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+h3 {
+  margin-top: 32px; /* vertical rhythm */
+  line-height: 1.3;
+}
+
+h4 {
+  margin-bottom: 18px;
+  color: var(--muted-text);
+  font-weight: 600;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: var(--body-text);
+}
+
+/* Lists */
+ul {
+  margin: 16px 0 24px;
+  padding-left: 1.2rem;
+}
+
+li {
+  margin: 6px 0;
+  line-height: 1.6;
+  color: var(--body-text);
+}
+
+/* Horizontal rule */
+hr {
+  background-color: rgba(199, 182, 255, 0.22);
+  border: none;
+  height: 1px;
+  margin: 28px 0;
+}
+
+/* Links */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  transition: background 120ms ease, transform 120ms ease, color 120ms ease, text-decoration-thickness 120ms ease;
+  border-radius: 8px; /* enables the pill highlight */
+}
+
+main a {
+  font-weight: 600; /* less shouty in prose */
+}
+
+a:hover,
+a:focus-visible {
+  background: rgba(199, 182, 255, 0.12);
+  color: rgba(242, 255, 250, 0.92);
+  text-decoration-thickness: 3px;
+  transform: translateY(-1px);
+}
+
+/* Accessible keyboard focus ring */
+a:focus-visible {
+  outline: 2px solid rgba(110, 231, 183, 0.45);
+  outline-offset: 2px;
+}
+
+pre ::selection {
+  background: rgba(110, 231, 183, 0.22);
+}
+
+/* -------------------------
+   Code blocks + inline code
+   ------------------------- */
+pre {
+  margin: 24px 0;
+  padding: 16px 18px;
+  overflow-x: auto;
+  border-radius: 12px;
+
+  position: relative;
+  padding-top: 34px; /* room for label */
+
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-left: 4px solid var(--code-green);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.30);
+
+  color: var(--code-text);
+}
+
+pre code {
+  display: block;
+  padding: 0;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+  margin: 0;
+
+  color: var(--code-text);
+
+  font-size: 0.96em;
+  line-height: 1.72;
+  white-space: pre;
+
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+
+/* Language label (shows the class name, e.g. "language-sh") */
+pre code[class^="language-"]::before {
+  content: attr(class);
+  position: absolute;
+  top: 10px;
+  right: 12px;
+
+  font-size: 12px;
+  color: rgba(207, 250, 229, 0.80);
+  border-color: rgba(110, 231, 183, 0.22);
+  background: rgba(110, 231, 183, 0.06);
+  border: 1px solid rgba(110, 231, 183, 0.18);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* Single-line code blocks shouldn’t waste vertical space */
+pre:has(code):not(:has(code br)) {
+  padding-top: 16px;
+}
+
+/* Inline code */
+p code,
+li code,
+h1 code,
+h2 code,
+h3 code,
+h4 code {
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  background: rgba(110, 231, 183, 0.10);
+  border: 1px solid rgba(110, 231, 183, 0.16);
+  color: var(--code-green);
+  font-size: 0.95em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Scrollbars (WebKit) */
+pre::-webkit-scrollbar { height: 10px; }
+pre::-webkit-scrollbar-thumb {
+  background: rgba(110, 231, 183, 0.28);
+  border-radius: 999px;
+}
+pre::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Base code default (good) */
+pre.astro-code {
+  color: var(--g1) !important;
+}
+
+/* Comments (Shiki gray) */
+pre.astro-code span[style*="color:#6A737D"],
+pre.astro-code span[style*="color: #6A737D"] {
+  color: var(--g-comment) !important;
+  font-style: italic;
+}
+
+/* Purple token -> main mint */
+pre.astro-code span[style*="color:#B392F0"],
+pre.astro-code span[style*="color: #B392F0"] {
+  color: var(--g3) !important;
+}
+
+/* Blues -> lighter mint / near-white mint (keeps hierarchy) */
+pre.astro-code span[style*="color:#79B8FF"],
+pre.astro-code span[style*="color: #79B8FF"] {
+  color: var(--g2) !important;
+}
+
+pre.astro-code span[style*="color:#9ECBFF"],
+pre.astro-code span[style*="color: #9ECBFF"] {
+  color: var(--g1) !important;
+}
+
+/* Pink/red -> strongest green (so operators/pipes still pop) */
+pre.astro-code span[style*="color:#F97583"],
+pre.astro-code span[style*="color: #F97583"] {
+  color: var(--g4) !important;
+}
+
+
+/* -------------------------
+   Mobile adjustments
+   ------------------------- */
+@media (max-width: 700px) {
+  header,
+  main,
+  footer {
+    max-width: 100%;
+  }
+
+  main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  header a {
+    margin: 0 8px;
+  }
+}
+
+/* =========================
+   Resume page helpers
+   ========================= */
+
+/* Resume name/title */
+.resume h1 {
+  color: var(--accent);
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+/* Resume header section */
+.resume-header {
+  margin-bottom: 32px;
+}
+
+.resume-header h1,
+.resume-header .resume-name {
+  margin-bottom: 16px;
+  margin-top: 0;
+  color: var(--accent);
+}
+
+.resume-header .resume-summary {
+  margin-bottom: 14px;
+  line-height: 1.7;
+}
+
+.resume-header .resume-links {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: var(--muted-text);
+  font-size: 0.96em;
+}
+
+.resume-header .resume-links a {
+  font-weight: 700;
+  margin: 0 2px;
+}
+
+/* Skills section with key-value layout */
+.resume-kv {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+.resume-kv-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.resume-kv-key {
+  color: var(--muted-text);
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+.resume-kv-val {
+  color: var(--body-text);
+  line-height: 1.7;
+}
+
+/* Job entries - handle markdown structure */
+.job {
+  margin: 32px 0;
+}
+
+.resume h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.resume h3 + p {
+  color: var(--muted-text);
+  font-size: 0.93em;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.resume h3 + p strong {
+  font-weight: 400;
+}
+
+.resume h3 + p + p {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+/* Legacy job-header structure (if used) */
+.job-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.job-title {
+  margin: 0;
+  font-size: 1.1em;
+}
+
+.job-meta {
+  color: var(--muted-text);
+  font-size: 0.93em;
+  font-weight: 400;
+  text-align: right;
+}
+
+.job-summary {
+  margin-top: 12px;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.job-bullets {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.job-bullets > li {
+  margin: 12px 0;
+}
+
+.job-bullets ul {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.job-bullets ul li {
+  margin: 8px 0;
+}
+
+/* Education */
+.edu {
+  margin: 20px 0;
+}
+
+.edu-degree {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.edu-meta {
+  color: var(--muted-text);
+  font-size: 0.93em;
+  margin-top: 0;
+}
+
+@media (max-width: 700px) {
+  .resume-kv-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .job-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .job-meta {
+    white-space: normal;
+  }
+}
+
+details.callout {
+  border: 1px solid rgba(110, 231, 183, 0.20);
+  background: rgba(10, 8, 14, 0.55);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+
+  /* unify the two blocks: keep one shadow, match mint */
+  box-shadow:
+    0 0 0 1px rgba(110, 231, 183, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+details.callout:hover {
+  border-color: rgba(110, 231, 183, 0.32);
+  background: rgba(10, 8, 14, 0.62);
+  box-shadow:
+    0 0 0 1px rgba(110, 231, 183, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+details.callout:focus-within {
+  border-color: rgba(110, 231, 183, 0.38);
+  box-shadow:
+    0 0 0 3px rgba(110, 231, 183, 0.12),
+    0 10px 28px rgba(0, 0, 0, 0.38);
+}
+
+/* Summary row styling */
+details.callout > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: rgba(242, 255, 250, 0.92); /* brighter than body-text */
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Custom marker */
+details.callout > summary::before {
+  content: "▸";
+  color: rgba(110, 231, 183, 0.95); /* mint, not page accent */
+  font-size: 1.1em;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+details.callout[open] > summary::before {
+  content: "▾";
+}
+
+/* Space between summary and content */
+details.callout > summary + * {
+  margin-top: 0.75rem;
+}
+
+/* Code blocks inside callout */
+details.callout pre {
+  margin: 0.75rem 0 0;
+}
+
+main details.callout {
+  margin: 1.25rem 0 2.75rem;
+}
+
+details.callout[open] > summary {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(110, 231, 183, 0.14);
+}

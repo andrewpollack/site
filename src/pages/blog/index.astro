@@ -1,0 +1,48 @@
+---
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const modules = import.meta.glob("./*.md", { eager: true });
+const posts = Object.values(modules);
+
+// newest first
+posts.sort(
+  (a, b) =>
+    new Date((b as any).frontmatter.date).getTime() -
+    new Date((a as any).frontmatter.date).getTime()
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog</title>
+    <link rel="stylesheet" href="/styles/style.css?v=1.6" />
+    <link rel="icon" href="/assets/images/hello.png" type="image/png" />
+  </head>
+
+  <body>
+    <Header />
+    <main>
+      <section>
+        <h2>Blog</h2>
+        <p>
+          A collection of insights and lessons learned from both personal projects and professional experience.
+        </p>
+
+        <hr />
+
+        {posts.map((p) => (
+          <article class="post-preview">
+            <h3><a href={(p as any).url}>{(p as any).frontmatter.title}</a></h3>
+            <h4>{(p as any).frontmatter.date}</h4>
+            <hr />
+          </article>
+        ))}
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>

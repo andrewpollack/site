@@ -1,0 +1,53 @@
+---
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const modules = import.meta.glob("./*.md", { eager: true });
+const readings = Object.values(modules);
+
+// newest first
+readings.sort(
+  (a, b) =>
+    new Date((b as any).frontmatter.date).getTime() -
+    new Date((a as any).frontmatter.date).getTime()
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Readings</title>
+    <link rel="stylesheet" href="/styles/style.css?v=1.6" />
+    <link rel="icon" href="/assets/images/hello.png" type="image/png" />
+  </head>
+
+  <body>
+    <Header />
+    <main>
+      <section>
+        <h2>Readings</h2>
+        <p>
+          Books and articles I particularly enjoyed.
+        </p>
+
+        <hr />
+
+        {readings.length > 0 ? (
+          readings.map((r) => (
+            <article class="post-preview">
+              <h3><a href={(r as any).url}>{(r as any).frontmatter.title}</a></h3>
+              <h4>{(r as any).frontmatter.date}</h4>
+              {(r as any).frontmatter.author && <p>by {(r as any).frontmatter.author}</p>}
+              <hr />
+            </article>
+          ))
+        ) : (
+          <p>Check back soon for more.</p>
+        )}
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
