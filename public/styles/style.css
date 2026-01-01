@@ -453,8 +453,31 @@ pre.astro-code span[style*="color: #F97583"] {
     padding-right: 16px;
   }
 
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
   header a {
-    margin: 0 8px;
+    margin: 0; /* kill the desktop margins */
+  }
+
+  header a:first-child {
+    flex: 1 0 100%;      /* force it to be its own row */
+    text-align: center;
+    justify-content: center; /* helps if it's inline-flex */
+    max-width: 100%;
+  }
+
+  /* Nav links */
+  header a:not(:first-child) {
+    flex: 0 0 auto;
+    padding: 8px 10px;   /* makes tap targets nicer */
   }
 }
 
