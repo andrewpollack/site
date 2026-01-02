@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/PostLayout.astro
 title:
-  "Build Succeeded, Import Failed: Debugging a glibc Mismatch in Python Wheels"
+  "Build succeeded, import failed: debugging a glibc mismatch in Python wheels"
 date: "January 1, 2026"
 ---
 
@@ -23,11 +23,11 @@ through again.
   distributing Python libraries and applications. It's basically a ZIP archive
   containing all the files necessary for installation, including pre-compiled
   binary components for packages that require them.
-- **`glibc`** / **GLIBC_2.xx**: `glibc` is the system C library for many Linux
-  distros (it comes from the OS, not the wheel). The GLIBC_2.xx strings seen in
-  errors are symbol version requirements embedded in a compiled `.so`. Loading
-  the `.so` on system’s glibc is older than required, loading the `.so` (often
-  at import time) fails.
+- **`glibc`** / **GLIBC_2.xx**: `glibc` is the system C library on many Linux
+  distros (it comes from the OS, not the wheel). The `GLIBC_2.xx` strings in
+  errors are **symbol-version requirements** embedded in a compiled `.so`. If
+  the system’s `glibc` is older than required, loading the `.so` (often at
+  import time) fails.
 
 ## Background
 
@@ -39,8 +39,8 @@ It's a compatibility contract with every environment you intend to support.
 
 In practice, the wheel build has to answer a few non-negotiable questions:
 
-- **Toolchain + libc:** Which compiler and C/C++ runtime (glibc / libstdc++) are
-  we linking against?
+- **Toolchain + libc:** Which compiler and C/C++ runtime (`glibc` / `libstdc++`)
+  are we linking against?
 - **Python ABI:** Which Python versions / ABIs must this extension load against?
 - **Developer ergonomics:** Can a new contributor to this open source project
   build this locally without tribal knowledge?
@@ -97,7 +97,7 @@ binary the wheel packaged:
   different Python version or incompatible C-API assumptions (often shows up as
   `undefined symbol` for Python C-API names).
 
-- **System libc (glibc) mismatch:** native extension requires a newer glibc
+- **System libc (`glibc`) mismatch:** native extension requires a newer glibc
   symbol version than the target machine provides (often shows up explicitly as
   `GLIBC_2.xx not found`).
 
@@ -252,7 +252,8 @@ the wheel and fails if the glibc "ceiling" is too new.
 
 Here's a small guardrail script that unzips the wheel, inspects
 `ray/_raylet.so`, and fails if the maximum referenced glibc version is greater
-than 2.17 (the manylinux2014 baseline):
+than 2.17 (the manylinux2014 baseline). In practice, you should scan every `.so`
+in the wheel:
 
 <details class="callout">
 <summary>Full glibc check</summary>
