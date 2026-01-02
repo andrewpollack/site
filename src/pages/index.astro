@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import "../styles/style.css";
 
 const modules = import.meta.glob("./blog/*.md", { eager: true });
 
@@ -22,7 +23,6 @@ const latest = posts[0];
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Andrew Pollack-Gray</title>
-    <link rel="stylesheet" href="/styles/style.css?v=1.7" />
     <link rel="icon" href="/assets/images/hello.png" type="image/png" />
   </head>
 

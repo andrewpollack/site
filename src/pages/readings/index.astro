@@ -1,6 +1,7 @@
 ---
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import "../../styles/style.css";
 
 const modules = import.meta.glob("./*.md", { eager: true });
 const readings = Object.values(modules);
@@ -19,7 +20,6 @@ readings.sort(
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Readings</title>
-    <link rel="stylesheet" href="/styles/style.css?v=1.7" />
     <link rel="icon" href="/assets/images/hello.png" type="image/png" />
   </head>
 
