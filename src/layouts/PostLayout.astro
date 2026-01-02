@@ -2,8 +2,17 @@
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/style.css";
+
 const { frontmatter } = Astro.props;
-const { title, date } = frontmatter;
+const { title, date, description } = frontmatter ?? {};
+
+const pageTitle = title ?? "Andrew Pollack-Gray";
+const pageDesc =
+  description ??
+  "Build systems, infrastructure, CI/CD, and developer productivity.";
+
+const ogImage = new URL("/assets/images/og.png", Astro.site).toString();
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
 <!doctype html>
@@ -12,23 +21,34 @@ const { title, date } = frontmatter;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>{title}</title>
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDesc} />
+    <link rel="canonical" href={canonical} />
 
     <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDesc} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
 
   <body>
     <Header />
-
     <main>
       <section>
-        <h2>{title}</h2>
+        <h2>{pageTitle}</h2>
         {date && <h4>{date}</h4>}
         <hr />
         <slot />
       </section>
     </main>
-
     <Footer />
   </body>
 </html>

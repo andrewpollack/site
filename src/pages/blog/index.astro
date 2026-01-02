@@ -12,6 +12,13 @@ posts.sort(
     new Date((b as any).frontmatter.date).getTime() -
     new Date((a as any).frontmatter.date).getTime()
 );
+
+const title = "Blog";
+const description =
+  "A collection of insights and lessons learned from both personal projects and professional experience.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL("/assets/images/og.png", Astro.site).toString();
 ---
 
 <!DOCTYPE html>
@@ -19,8 +26,25 @@ posts.sort(
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Blog</title>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
     <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
 
   <body>
@@ -28,15 +52,15 @@ posts.sort(
     <main>
       <section>
         <h2>Blog</h2>
-        <p>
-          A collection of insights and lessons learned from both personal projects and professional experience.
-        </p>
+        <p>{description}</p>
 
         <hr />
 
         {posts.map((p) => (
           <article class="post-preview">
-            <h3><a href={(p as any).url}>{(p as any).frontmatter.title}</a></h3>
+            <h3>
+              <a href={(p as any).url}>{(p as any).frontmatter.title}</a>
+            </h3>
             <h4>{(p as any).frontmatter.date}</h4>
             <hr />
           </article>

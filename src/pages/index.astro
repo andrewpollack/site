@@ -4,7 +4,6 @@ import Footer from "../components/Footer.astro";
 import "../styles/style.css";
 
 const modules = import.meta.glob("./blog/*.md", { eager: true });
-
 const posts = Object.values(modules);
 
 // Sort newest first (date string in frontmatter.date)
@@ -15,6 +14,13 @@ posts.sort(
 );
 
 const latest = posts[0];
+
+const title = "Andrew Pollack-Gray";
+const description =
+  "Build systems, infrastructure, CI/CD, and the invisible mechanics of developer productivity.";
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL("/assets/images/og.png", Astro.site).toString();
 ---
 
 <!DOCTYPE html>
@@ -22,8 +28,25 @@ const latest = posts[0];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Andrew Pollack-Gray</title>
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
     <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
   </head>
 
   <body>
@@ -47,44 +70,54 @@ const latest = posts[0];
 
           <div class="about-text">
             <p>
-              Hello, I’m Andrew Pollack-Gray! I like the parts of software that make
-              everything else possible: build systems, infrastructure, CI/CD, and the
-              invisible mechanics of developer productivity.
+              Hello, I’m Andrew Pollack-Gray! I like the parts of software that
+              make everything else possible: build systems, infrastructure,
+              CI/CD, and the invisible mechanics of developer productivity.
             </p>
 
             <p>
-              I'm currently working at <a href="https://www.anyscale.com/">Anyscale</a> as
-              part of the Release and Engineering Efficiency (REEf) team.
+              I'm currently working at
+              <a href="https://www.anyscale.com/">Anyscale</a>
+              as part of the Release and Engineering Efficiency (REEf) team.
             </p>
 
             <p>
-              Outside of work, I play the Euphonium and try to get better at cooking.
-              I also love to tinker with personal automations on a
-              <a href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#pi-infrastructure">
+              Outside of work, I play the Euphonium and try to get better at
+              cooking. I also love to tinker with personal automations on a
+              <a
+                href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#pi-infrastructure"
+              >
                 Raspberry Pi cluster
               </a>.
               My favorite is a series of
-              <a href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#meals-go--meals-frontend/">
+              <a
+                href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#meals-go--meals-frontend/"
+              >
                 grocery list automations
               </a>
-              that my wife and I use all the time. This type of automation brings me endless joy.
+              that my wife and I use all the time. This type of automation
+              brings me endless joy.
             </p>
           </div>
         </div>
       </section>
-
 
       <hr />
 
       <section>
         <h2>Blog</h2>
         <p>
-          A collection of insights and lessons learned from both personal projects and professional experience.
+          A collection of insights and lessons learned from both personal
+          projects and professional experience.
         </p>
 
         {latest ? (
           <>
-            <h3><a href={(latest as any).url}>{(latest as any).frontmatter.title}</a></h3>
+            <h3>
+              <a href={(latest as any).url}>
+                {(latest as any).frontmatter.title}
+              </a>
+            </h3>
             <h4>{(latest as any).frontmatter.date}</h4>
           </>
         ) : (
