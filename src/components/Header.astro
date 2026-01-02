@@ -15,17 +15,13 @@ const isActive = (href: string) =>
 ---
 
 <header class="site-header">
-  <a class="brand" href="/" aria-current={path === "/" ? "page" : undefined}>
+  <a class="brand" href="/">
     Andrew Pollack-Gray
   </a>
 
-  <nav class="site-nav">
+  <nav class="site-nav" aria-label="Primary">
     {nav.map((item) => (
-      <a
-        href={item.href}
-        aria-current={isActive(item.href) ? "page" : undefined}
-        class={isActive(item.href) ? "active" : undefined}
-      >
+      <a href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
         {item.label}
       </a>
     ))}

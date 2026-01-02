@@ -23,12 +23,11 @@
   --g2: rgba(150, 247, 203, 0.92); /* mint (main) */
   --g3: rgba(110, 231, 183, 0.92); /* strong mint */
   --g4: rgba(72, 214, 160, 0.92);  /* deepest green (still readable) */
-
   --g-comment: rgba(205, 255, 236, 0.55); /* readable but clearly “comment” */
 
   /* Code */
   --code-mint: #6EE7B7;          /* commands / primary */
-  --code-blue: #9ECBFF;          /* flags / paths / params */
+  --code-blue: #A3D4FF;          /* flags / paths / params */
   --code-lav:  #C7B6FF;          /* keywords / types */
   --code-peach:#FFB4A1;          /* operators / punctuation / pipes */
   --code-comment: rgba(230, 227, 238, 0.68);
@@ -36,162 +35,10 @@
   --code-green-dim: rgba(110, 231, 183, 0.82);
   --code-text: #CFFAE5;
   --code-purple: #C7B6FF;
-  --code-blue: #A3D4FF;
   --code-bg: #14101A;
   --code-border: rgba(110, 231, 183, 0.22);
   --code-accent: rgba(157, 123, 255, 0.80);
 }
-
-.about-grid {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 2rem;
-  align-items: start;
-  margin-top: 1rem;
-}
-
-.about-photo {
-  margin: 0;
-  padding: 12px;
-  border-radius: 16px;
-
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(199, 182, 255, 0.18); /* accent */
-  box-shadow:
-    inset 0 0 0 1px rgba(199, 182, 255, 0.08),
-    0 12px 30px rgba(0, 0, 0, 0.35);
-}
-
-.about-photo img {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 12px;
-  object-fit: cover;
-}
-
-@media (max-width: 900px) {
-  header, main, footer { max-width: 100%; }
-  
-  .about-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .about-photo {
-    padding: 8px;
-    max-width: 520px;
-    margin: 0 auto 0.75rem; /* center it + keep spacing */
-  }
-
-  .about-photo img {
-    height: min(42vh, 340px);
-    object-position: 50% 15%;
-  }
-
-  .about-text p:first-child {
-    margin-top: 0.25rem;
-  }
-  
-  .about-photo { margin-bottom: 0.75rem; }
-}
-
-.about-text {
-  max-width: 68ch;
-}
-
-
-
-.role {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.role-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
-  object-fit: contain;   /* better for logos than cover */
-  flex: 0 0 auto;
-  transform: translateY(1px); /* tiny baseline nudge */
-  opacity: 0.95;
-}
-
-.site-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 18px;
-  padding: 14px var(--padding-main);
-}
-
-/* Brand + nav links: no native underline */
-.site-header .brand,
-.site-header .site-nav a,
-.site-header > a {
-  text-decoration: none !important;
-  position: relative;
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 10px;
-}
-
-/* Brand color */
-.site-header .brand {
-  color: rgba(242, 255, 250, 0.92);
-  font-weight: 900;
-}
-
-/* Pseudo underline (tight, controlled width) */
-.site-header .brand::after,
-.site-header .site-nav a::after,
-.site-header > a::after {
-  content: "";
-  position: absolute;
-  left: 10px;   /* match padding */
-  right: 10px;  /* match padding */
-  bottom: 4px;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(199, 182, 255, 0.80);
-
-  transform: scaleX(0);
-  transform-origin: center;
-  opacity: 0.9;
-  transition: transform 120ms ease, opacity 120ms ease;
-}
-
-/* Hover/focus shows underline without overshoot */
-.site-header .brand:hover::after,
-.site-header .brand:focus-visible::after,
-.site-header .site-nav a:hover::after,
-.site-header .site-nav a:focus-visible::after,
-.site-header > a:hover::after,
-.site-header > a:focus-visible::after {
-  transform: scaleX(1);
-  opacity: 1;
-}
-
-/* Active page */
-.site-header a[aria-current="page"] {
-  background: rgba(199, 182, 255, 0.10);
-}
-
-.site-header a[aria-current="page"]::after {
-  transform: scaleX(1);
-  opacity: 1;
-  height: 3px;
-  background: rgba(199, 182, 255, 0.92);
-}
-
-/* Keep keyboard focus visible */
-.site-header a:focus-visible {
-  outline: 2px solid rgba(110, 231, 183, 0.45);
-  outline-offset: 2px;
-}
-
-
 
 /* -------------------------
    Base layout
@@ -229,17 +76,20 @@ footer {
 }
 
 /* -------------------------
-   Header / nav
+   Header / nav (site header)
    ------------------------- */
-header {
+.site-header {
   position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 18px;
   padding: 14px var(--padding-main);
-  text-align: center; /* matches your current look */
   color: rgba(185, 180, 198, 0.70);
 }
 
 /* Full-width divider line under header (not limited to 75ch) */
-header::after {
+.site-header::after {
   content: "";
   position: absolute;
   left: 50%;
@@ -251,34 +101,63 @@ header::after {
   pointer-events: none;
 }
 
-header:not(.site-header) a {
-  font-weight: 800;
-  margin: 0 10px;
+/* Brand + nav links: no native underline */
+.site-header .brand,
+.site-header .site-nav a {
+  text-decoration: none !important;
+  position: relative;
+  display: inline-block;
   padding: 6px 10px;
   border-radius: 10px;
-
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 2px;
-
-  transition: background 120ms ease, transform 120ms ease, color 120ms ease;
 }
 
-/* Make hover feel clearly interactive */
-header a:hover,
-header a:focus-visible {
-  background: rgba(199, 182, 255, 0.12);
-  color: rgba(242, 255, 250, 0.92); /* near-white so it pops */
-  transform: translateY(-1px);
-  text-decoration-thickness: 3px;
+/* Brand color */
+.site-header .brand {
+  color: rgba(242, 255, 250, 0.92);
+  font-weight: 900;
 }
 
-header a:hover {
-  box-shadow: 0 0 0 1px rgba(199, 182, 255, 0.20);
+/* Pseudo underline (tight, controlled width) */
+.site-header .brand::after,
+.site-header .site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 10px;   /* match padding */
+  right: 10px;  /* match padding */
+  bottom: 4px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(199, 182, 255, 0.80);
+
+  transform: scaleX(0);
+  transform-origin: center;
+  opacity: 0.9;
+  transition: transform 120ms ease, opacity 120ms ease;
 }
 
-/* Keyboard focus ring */
-header a:focus-visible {
+/* Hover/focus shows underline without overshoot */
+.site-header .brand:hover::after,
+.site-header .brand:focus-visible::after,
+.site-header .site-nav a:hover::after,
+.site-header .site-nav a:focus-visible::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Active page */
+.site-header a[aria-current="page"] {
+  background: rgba(199, 182, 255, 0.10);
+}
+
+.site-header a[aria-current="page"]::after {
+  transform: scaleX(1);
+  opacity: 1;
+  height: 3px;
+  background: rgba(199, 182, 255, 0.92);
+}
+
+/* Keep keyboard focus visible */
+.site-header a:focus-visible {
   outline: 2px solid rgba(110, 231, 183, 0.45);
   outline-offset: 2px;
 }
@@ -362,14 +241,18 @@ hr {
   margin: 28px 0;
 }
 
-/* Links */
+/* Links (content links) */
 a {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
   font-weight: 700;
   text-decoration-thickness: 2px;
-  transition: background 120ms ease, transform 120ms ease, color 120ms ease, text-decoration-thickness 120ms ease;
+  transition:
+    background 120ms ease,
+    transform 120ms ease,
+    color 120ms ease,
+    text-decoration-thickness 120ms ease;
   border-radius: 8px; /* enables the pill highlight */
 }
 
@@ -391,13 +274,67 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-pre ::selection {
-  background: rgba(110, 231, 183, 0.22);
+/* -------------------------
+   About section (home)
+   ------------------------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.about-photo {
+  margin: 0;
+  padding: 12px;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(199, 182, 255, 0.18); /* accent */
+  box-shadow:
+    inset 0 0 0 1px rgba(199, 182, 255, 0.08),
+    0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.about-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.about-text {
+  max-width: 68ch;
+}
+
+/* -------------------------
+   Role header (resume)
+   ------------------------- */
+.role {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.role-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  transform: translateY(1px);
+  opacity: 0.95;
 }
 
 /* -------------------------
    Code blocks + inline code
    ------------------------- */
+pre ::selection {
+  background: rgba(110, 231, 183, 0.22);
+}
+
 pre {
   margin: 24px 0;
   padding: 16px 18px;
@@ -429,7 +366,6 @@ pre code {
 
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
-
 
 /* Language label (shows the class name, e.g. "language-sh") */
 pre code[class^="language-"]::before {
@@ -478,7 +414,7 @@ pre::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Base code default (good) */
+/* Shiki / astro-code overrides */
 pre.astro-code {
   color: var(--g1) !important;
 }
@@ -513,76 +449,15 @@ pre.astro-code span[style*="color: #F97583"] {
   color: var(--g4) !important;
 }
 
-
 /* -------------------------
-   Mobile adjustments
-   ------------------------- */
-@media (max-width: 700px) {
-  header,
-  main,
-  footer {
-    max-width: 100%;
-  }
-
-  header {
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  header:not(.site-header) a {
-    padding: 6px 10px;      /* slightly smaller pills */
-  }
-
-  header a:first-child {
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-
-  main {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  header:not(.site-header) a {
-    margin: 0; /* kill the desktop margins */
-  }
-
-  header a:first-child {
-    flex: 1 0 100%;      /* force it to be its own row */
-    text-align: center;
-    justify-content: center; /* helps if it's inline-flex */
-    max-width: 100%;
-  }
-
-  /* Nav links */
-  header a:not(:first-child) {
-    flex: 0 0 auto;
-    padding: 8px 10px;   /* makes tap targets nicer */
-  }
-}
-
-/* =========================
    Resume page helpers
-   ========================= */
-
-/* Resume name/title */
+   ------------------------- */
 .resume h1 {
   color: var(--accent);
   margin-bottom: 16px;
   margin-top: 0;
 }
 
-/* Resume header section */
 .resume-header {
   margin-bottom: 32px;
 }
@@ -637,7 +512,7 @@ pre.astro-code span[style*="color: #F97583"] {
   line-height: 1.7;
 }
 
-/* Job entries - handle markdown structure */
+/* Job entries */
 .job {
   margin: 32px 0;
 }
@@ -726,30 +601,15 @@ pre.astro-code span[style*="color: #F97583"] {
   margin-top: 0;
 }
 
-@media (max-width: 700px) {
-  .resume-kv-row {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-
-  .job-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .job-meta {
-    white-space: normal;
-  }
-}
-
+/* -------------------------
+   Callout (details)
+   ------------------------- */
 details.callout {
   border: 1px solid rgba(110, 231, 183, 0.20);
   background: rgba(10, 8, 14, 0.55);
   border-radius: 12px;
   padding: 0.9rem 1rem;
 
-  /* unify the two blocks: keep one shadow, match mint */
   box-shadow:
     0 0 0 1px rgba(110, 231, 183, 0.08),
     0 8px 24px rgba(0, 0, 0, 0.35);
@@ -776,7 +636,7 @@ details.callout:focus-within {
 details.callout > summary {
   cursor: pointer;
   font-weight: 700;
-  color: rgba(242, 255, 250, 0.92); /* brighter than body-text */
+  color: rgba(242, 255, 250, 0.92);
   list-style: none;
   display: flex;
   align-items: center;
@@ -786,7 +646,7 @@ details.callout > summary {
 /* Custom marker */
 details.callout > summary::before {
   content: "▸";
-  color: rgba(110, 231, 183, 0.95); /* mint, not page accent */
+  color: rgba(110, 231, 183, 0.95);
   font-size: 1.1em;
   line-height: 1;
   transform: translateY(-1px);
@@ -796,12 +656,10 @@ details.callout[open] > summary::before {
   content: "▾";
 }
 
-/* Space between summary and content */
 details.callout > summary + * {
   margin-top: 0.75rem;
 }
 
-/* Code blocks inside callout */
 details.callout pre {
   margin: 0.75rem 0 0;
 }
@@ -813,4 +671,74 @@ main details.callout {
 details.callout[open] > summary {
   padding-bottom: 0.6rem;
   border-bottom: 1px solid rgba(110, 231, 183, 0.14);
+}
+
+/* -------------------------
+   Responsive adjustments
+   ------------------------- */
+@media (max-width: 900px) {
+  header, main, footer { max-width: 100%; }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .about-photo {
+    padding: 8px;
+    max-width: 520px;
+    margin: 0 auto 0.75rem;
+  }
+
+  .about-photo img {
+    height: min(42vh, 340px);
+    object-position: 50% 15%;
+  }
+
+  .about-text p:first-child {
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 700px) {
+  header,
+  main,
+  footer {
+    max-width: 100%;
+  }
+
+  main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Mobile site header */
+  .site-header {
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+
+  .site-header .brand {
+    flex: 1 0 100%;
+    text-align: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .site-header .site-nav a {
+    padding: 8px 10px;
+  }
+
+  /* Resume layout tweaks */
+  .resume-kv-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .job-meta {
+    white-space: normal;
+  }
 }

@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/PostLayout.astro
 title:
-  'When "Build Succeeded" Lies: Debugging a GLIBC Mismatch in Python Wheels'
+  'When “Build Succeeded” Lies: Debugging a glibc Mismatch in Python Wheels'
 date: "January 1, 2026"
 ---
 
@@ -61,7 +61,7 @@ In practice, the wheel build has to answer a few non-negotiable questions:
 - **CI efficiency:** Can we reuse expensive C++ outputs instead of recompiling
   repeatedly?
 
-Before refactor, Ray's wheel build was orchestrated by a Python script that runs
+Before the refactor, Ray's wheel build was orchestrated by a Python script that runs
 inside a container:
 [builder_container.py](https://github.com/ray-project/ray/blob/efb34a676b05da643cf6733c765564757c76c206/ci/ray_ci/builder_container.py#L25-L44).
 
@@ -102,7 +102,7 @@ OSError: /lib64/libm.so.6: version `GLIBC_2.29' not found
 
 Oof. So I put my debug hat on and dove right in.
 
-## Quick triage: Python ABI mismatch vs GLIBC mismatch
+## Quick triage: Python ABI mismatch vs glibc mismatch
 
 Different errors can come from different mismatches (Python ABI vs libc), so the
 next step was to determine which one I was actually hitting and inspect the
@@ -112,11 +112,11 @@ binary the wheel packaged:
   different Python version or incompatible C-API assumptions (often shows up as
   `undefined symbol` for Python C-API names).
 
-- **System libc (GLIBC) mismatch:** native extension requires a newer GLIBC
+- **System libc (glibc) mismatch:** native extension requires a newer glibc
   symbol version than the target machine provides (often shows up explicitly as
   `GLIBC_2.xx not found`).
 
-The GLIBC error made the direction clear: it's time to verify what GLIBC version
+The glibc error made the direction clear: it's time to verify what glibc version
 the packaged `.so` required.
 
 <details class="callout">
@@ -138,7 +138,7 @@ runtimes can’t satisfy expected Python C-API symbols
 
 ## Diagnosing the problem
 
-I extracted the `.so` from the wheel and inspected its GLIBC requirements:
+I extracted the `.so` from the wheel and inspected its glibc ceiling:
 
 ```sh
 unzip -p ray-*.whl "ray/_raylet.so" > /tmp/raylet.so
@@ -161,14 +161,14 @@ GLIBC_2.17  # <- highest version is 2.17. Within expectations
 
 To make this clear, if you were to publish a wheel like this, **it would fail on
 any system whose glibc is older than 2.29, violating
-[PEP 599](https://peps.python.org/pep-0599/) compatibility goals**
+[PEP 599](https://peps.python.org/pep-0599/) compatibility goals.**
 
 ## Why this matters: manylinux and the "GLIBC ceiling"
 
 The general rule of thumb when dealing with native extensions is:
 
-- Binaries built against older GLIBC usually run on newer systems.
-- Binaries built against newer GLIBC do not run on older systems.
+- Binaries built against older glibc usually run on newer systems.
+- Binaries built against newer glibc do not run on older systems.
 
 If you distribute wheels broadly to Linux users (e.g. via PyPI), one approach is
 to target a manylinux baseline. One common baseline is **manylinux2014** (see
@@ -177,10 +177,10 @@ to target a manylinux baseline. One common baseline is **manylinux2014** (see
 
 More generally: newer manylinux tags exist (e.g. the `manylinux_2_x` family)
 when you intentionally choose a higher baseline. But whatever baseline you
-choose, the core rule is the same: your binary must not require GLIBC symbols
+choose, the core rule is the same: your binary must not require glibc symbols
 newer than the baseline.
 
-So if your wheel accidentally links against GLIBC 2.29, it might work on Ubuntu
+So if your wheel accidentally links against glibc 2.29, it might work on Ubuntu
 22.04 but fail on older enterprise distros—and plenty of production environments
 still look a lot closer to "old" than "new". The baseline is the **maximum**
 glibc you’re allowed to require.
@@ -196,10 +196,10 @@ objdump -p /tmp/ray_pkg/ray/_raylet.so | grep GLIBC | sort -u
 GLIBC_2.17
 ```
 
-That binary topped out at GLIBC 2.17, which is what we're looking for. This is
+That binary topped out at glibc 2.17, which is what we're looking for. This is
 clearly not the same file that the wheel contains.
 
-### Smoke test: size mismatch suggests an silent rebuild
+### Smoke test: size mismatch suggests a silent rebuild
 
 A quick sanity check that often catches "you packaged a different artifact than
 you think" is size:
@@ -252,7 +252,7 @@ COPY python/ python/
 Because the cached artifact never overwrote the expected path, the image build
 context kept a locally-built `python/ray/_raylet.so`. That local binary was
 produced in a newer environment, so the resulting wheel "looked fine" during
-build but was incompatible on older GLIBC systems.
+build but was incompatible on older glibc systems.
 
 The good news: once we understood the failure mode, the fix was straightforward.
 Additionally, we now have a concrete guardrail we could add to prevent this type
@@ -263,17 +263,17 @@ of error forever.
 This is mainly a reminder to myself: always verify what you packaged, not just
 what you built. The simplest way to make this failure mode go away is to add a
 fast, deterministic check directly to the build script (or CI job) that inspects
-the wheel and fails if the GLIBC "ceiling" is too new.
+the wheel and fails if the glibc "ceiling" is too new.
 
 Here's a small guardrail script that unzips the wheel, inspects
-`ray/_raylet.so`, and fails if the maximum referenced GLIBC version is greater
+`ray/_raylet.so`, and fails if the maximum referenced glibc version is greater
 than 2.17 (the manylinux2014 baseline):
 
 <details class="callout">
-<summary>Full GLIBC Check</summary>
+<summary>Full glibc check</summary>
 
 ```sh
-# Verify built wheel has correct GLIBC (must be <= 2.17 for manylinux2014)
+# Verify built wheel has correct glibc (must be <= 2.17 for manylinux2014)
 # This catches issues where local build artifacts leak into the Docker context.
 WHEEL_FILE=$(ls -1 .whl/ray-*.whl 2>/dev/null | grep -v ray_cpp | head -n 1)
 if [[ -n "$WHEEL_FILE" ]]; then
@@ -301,13 +301,13 @@ if [[ -n "$WHEEL_FILE" ]]; then
   rm -rf "$TMPDIR"
 
   if [[ -z "$MAX_GLIBC" ]]; then
-    echo "WARNING: no GLIBC version references found in $SO_PATH (unexpected?)"
+    echo "WARNING: no glibc version references found in $SO_PATH (unexpected?)"
   elif [[ "$(printf '%s\n' "2.17" "$MAX_GLIBC" | sort -V | tail -n 1)" != "2.17" ]]; then
-    echo "ERROR: Wheel contains _raylet.so requiring GLIBC $MAX_GLIBC (max allowed: 2.17)"
+    echo "ERROR: Wheel contains _raylet.so requiring glibc $MAX_GLIBC (max allowed: 2.17)"
     echo "This usually means a local build artifact leaked into the Docker context."
     exit 1
   else
-    echo "GLIBC check passed: max required GLIBC is $MAX_GLIBC (allowed <= 2.17)"
+    echo "glibc check passed: max required glibc is $MAX_GLIBC (allowed <= 2.17)"
   fi
 fi
 ```
@@ -321,14 +321,14 @@ fi
   verify what binary you actually packaged.
 - "Build succeeded" doesn't mean "wheel is compatible." Native code can be
   rebuilt during packaging without obvious red flags unless you add checks.
-- GLIBC version requirements are the fastest compatibility signal. Bake these
+- glibc ceiling is the fastest compatibility signal. Bake checks for this
   into the build process.
 
-## Minimal repro: demonstrating the GLIBC trap in Docker
+## Minimal repro: demonstrating the glibc trap in Docker
 
 I like having a minimal demo that proves the concept outside the complexity of a
 real project. For this minimal repro, we'll show how a builder and runner image
-with different GLIBC versions can cause issues.
+with different glibc versions can cause issues.
 
 The idea:
 
@@ -353,7 +353,7 @@ RUN apt-get update && apt-get install -y gcc
 
 FROM quay.io/pypa/manylinux2014_x86_64 AS test-manylinux
 COPY --from=ubuntu-builder /hello-ubuntu /hello-ubuntu
-RUN /hello-ubuntu  # <- will fail if it requires newer GLIBC
+RUN /hello-ubuntu  # <- will fail if it requires newer glibc
 ```
 
 <details class="callout">
@@ -362,29 +362,29 @@ RUN /hello-ubuntu  # <- will fail if it requires newer GLIBC
 ```dockerfile
 # syntax=docker/dockerfile:1.3-labs
 #
-# GLIBC Compatibility Demo
+# glibc Compatibility Demo
 # ========================
-# Demonstrates how binaries built on newer GLIBC fail on older systems.
+# Demonstrates how binaries built on newer glibc fail on older systems.
 #
 # Build: docker build -f glibc-demo.Dockerfile -t glibc-demo .
 # The build output shows the problem and solution.
 
 #############################################################################
-# Stage 1: Build on Ubuntu 22.04 (GLIBC 2.35 - too new for manylinux2014)
+# Stage 1: Build on Ubuntu 22.04 (glibc 2.35 - too new for manylinux2014)
 #############################################################################
 FROM ubuntu:22.04 AS ubuntu-builder
 
 RUN apt-get update && apt-get install -y gcc
 
-# Create a simple C program that uses a function requiring newer GLIBC
-# reallocarray() was added in GLIBC 2.26
+# Create a simple C program that uses a function requiring newer glibc
+# reallocarray() was added in glibc 2.26
 RUN <<EOF
 cat > /hello.c << 'CCODE'
 #include <stdio.h>
 #include <stdlib.h>
 
 int main() {
-    // reallocarray requires GLIBC 2.26+
+    // reallocarray requires glibc 2.26+
     int *arr = reallocarray(NULL, 10, sizeof(int));
     if (arr) {
         printf("Hello from Ubuntu-built binary!\\n");
@@ -398,26 +398,26 @@ EOF
 
 RUN gcc -o /hello-ubuntu /hello.c
 
-# Check GLIBC requirements
-RUN echo "=== Ubuntu-built binary GLIBC requirements ===" && \
+# Check glibc ceiling
+RUN echo "=== Ubuntu-built binary glibc ceiling ===" && \
     objdump -p /hello-ubuntu | grep GLIBC && \
     echo "" && \
-    echo "System GLIBC version:" && \
+    echo "System glibc version:" && \
     ldd --version | head -1
 
 #############################################################################
-# Stage 2: Build on manylinux2014 (GLIBC 2.17 - compatible)
+# Stage 2: Build on manylinux2014 (glibc 2.17 - compatible)
 #############################################################################
 FROM quay.io/pypa/manylinux2014_x86_64 AS manylinux-builder
 
-# Create the same program but avoid reallocarray (not available in GLIBC 2.17)
+# Create the same program but avoid reallocarray (not available in glibc 2.17)
 RUN <<EOF
 cat > /hello.c << 'CCODE'
 #include <stdio.h>
 #include <stdlib.h>
 
 int main() {
-    // Use calloc instead - available in all GLIBC versions
+    // Use calloc instead - available in all glibc versions
     int *arr = calloc(10, sizeof(int));
     if (arr) {
         printf("Hello from manylinux2014-built binary!\\n");
@@ -431,15 +431,15 @@ EOF
 
 RUN gcc -o /hello-manylinux /hello.c
 
-# Check GLIBC requirements
-RUN echo "=== manylinux2014-built binary GLIBC requirements ===" && \
+# Check glibc ceiling
+RUN echo "=== manylinux2014-built binary glibc ceiling ===" && \
     objdump -p /hello-manylinux | grep GLIBC && \
     echo "" && \
-    echo "System GLIBC version:" && \
+    echo "System glibc version:" && \
     ldd --version | head -1
 
 #############################################################################
-# Stage 3: Test both binaries on manylinux2014 (GLIBC 2.17)
+# Stage 3: Test both binaries on manylinux2014 (glibc 2.17)
 #############################################################################
 FROM quay.io/pypa/manylinux2014_x86_64 AS test-manylinux
 
@@ -452,19 +452,19 @@ set -x
 
 echo ""
 echo "=============================================="
-echo "Testing on manylinux2014 (GLIBC 2.17)"
+echo "Testing on manylinux2014 (glibc 2.17)"
 echo "=============================================="
 echo ""
 
-echo "--- System GLIBC version ---"
+echo "--- System glibc version ---"
 ldd --version | head -1
 echo ""
 
-echo "--- Ubuntu-built binary GLIBC requirements ---"
+echo "--- Ubuntu-built binary glibc ceiling ---"
 objdump -p /hello-ubuntu | grep GLIBC || true
 echo ""
 
-echo "--- manylinux2014-built binary GLIBC requirements ---"
+echo "--- manylinux2014-built binary glibc ceiling ---"
 objdump -p /hello-manylinux | grep GLIBC || true
 echo ""
 
@@ -477,21 +477,21 @@ echo ""
 echo "=============================================="
 echo "TEST 2: Running Ubuntu-built binary"
 echo "=============================================="
-/hello-ubuntu && echo "SUCCESS!" || echo "FAILED: Ubuntu binary requires newer GLIBC!"
+/hello-ubuntu && echo "SUCCESS!" || echo "FAILED: Ubuntu binary requires newer glibc!"
 echo ""
 
 echo "=============================================="
 echo "CONCLUSION"
 echo "=============================================="
-echo "The Ubuntu-built binary fails because it requires GLIBC 2.26+"
-echo "(for reallocarray), but manylinux2014 only has GLIBC 2.17."
+echo "The Ubuntu-built binary fails because it requires glibc 2.26+"
+echo "(for reallocarray), but manylinux2014 only has glibc 2.17."
 echo ""
 echo "This is exactly what happens when wheel builds accidentally"
 echo "use binaries compiled outside the manylinux container."
 EOF
 
 #############################################################################
-# Stage 4: Test both binaries on Ubuntu 22.04 (GLIBC 2.35)
+# Stage 4: Test both binaries on Ubuntu 22.04 (glibc 2.35)
 #############################################################################
 FROM ubuntu:22.04 AS test-ubuntu
 
@@ -504,11 +504,11 @@ set -x
 
 echo ""
 echo "=============================================="
-echo "Testing on Ubuntu 22.04 (GLIBC 2.35)"
+echo "Testing on Ubuntu 22.04 (glibc 2.35)"
 echo "=============================================="
 echo ""
 
-echo "--- System GLIBC version ---"
+echo "--- System glibc version ---"
 ldd --version | head -1
 echo ""
 
@@ -527,9 +527,9 @@ echo ""
 echo "=============================================="
 echo "KEY INSIGHT"
 echo "=============================================="
-echo "Binaries built with older GLIBC work on newer systems (forwards compatible)."
-echo "Binaries built with newer GLIBC do NOT work on older systems."
-echo "This is why manylinux2014 (GLIBC 2.17) ensures broad compatibility."
+echo "Binaries built with older glibc work on newer systems (forwards compatible)."
+echo "Binaries built with newer glibc do NOT work on older systems."
+echo "This is why manylinux2014 (glibc 2.17) ensures broad compatibility."
 EOF
 
 #############################################################################
@@ -545,10 +545,10 @@ COPY --from=test-ubuntu /hello-ubuntu /test-passed-ubuntu
 ## Handy commands for later reference
 
 ```sh
-# Inspect a system's GLIBC version
+# Inspect a system's glibc version
 ldd --version | head -1
 
-# Show which GLIBC symbol versions this .so requires (the "GLIBC ceiling")
+# Show which glibc symbol versions this .so requires (the "glibc ceiling")
 objdump -T ray/_raylet.so | grep GLIBC | sort -u
 
 # Quick dependency list from ELF metadata
