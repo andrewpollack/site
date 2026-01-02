@@ -40,7 +40,7 @@ collaboration.
 **Dec 2025 – Present · San Francisco, CA**
 
 <h3 class="role">
-  <img class="role-icon" src="/assets/images/skydio.jpg" alt="Skydio logo" />
+  <img class="role-icon" src="/assets/images/skydio.png" alt="Skydio logo" />
   <span>Skydio — Senior Software Engineer (L5)</span>
 </h3>
 

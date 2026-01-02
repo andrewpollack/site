@@ -42,6 +42,66 @@
   --code-accent: rgba(157, 123, 255, 0.80);
 }
 
+.about-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+.about-photo {
+  margin: 0;
+  padding: 12px;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(199, 182, 255, 0.18); /* accent */
+  box-shadow:
+    inset 0 0 0 1px rgba(199, 182, 255, 0.08),
+    0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.about-photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  header, main, footer { max-width: 100%; }
+  
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .about-photo {
+    padding: 8px;
+    max-width: 520px;
+    margin: 0 auto 0.75rem; /* center it + keep spacing */
+  }
+
+  .about-photo img {
+    height: min(42vh, 340px);
+    object-position: 50% 15%;
+  }
+
+  .about-text p:first-child {
+    margin-top: 0.25rem;
+  }
+  
+  .about-photo { margin-bottom: 0.75rem; }
+}
+
+.about-text {
+  max-width: 68ch;
+}
+
+
+
 .role {
   display: flex;
   align-items: center;
@@ -191,7 +251,7 @@ header::after {
   pointer-events: none;
 }
 
-header a {
+header:not(.site-header) a {
   font-weight: 800;
   margin: 0 10px;
   padding: 6px 10px;
@@ -464,6 +524,20 @@ pre.astro-code span[style*="color: #F97583"] {
     max-width: 100%;
   }
 
+  header {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  header:not(.site-header) a {
+    padding: 6px 10px;      /* slightly smaller pills */
+  }
+
+  header a:first-child {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
   main {
     padding-left: 16px;
     padding-right: 16px;
@@ -479,7 +553,7 @@ pre.astro-code span[style*="color: #F97583"] {
     padding-right: 16px;
   }
 
-  header a {
+  header:not(.site-header) a {
     margin: 0; /* kill the desktop margins */
   }
 
