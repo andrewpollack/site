@@ -73,7 +73,7 @@ confidence.
   reducing lint checks per PR from ~60 minutes → <15 minutes.
 
 <h3 class="role">
-  <img class="role-icon" src="/assets/images/google.svg.webp" alt="Google logo" />
+  <img class="role-icon" src="/assets/images/google-color.png" alt="Google logo" />
   <span>Google LLC — Software Engineer (L4)</span>
 </h3>
 
