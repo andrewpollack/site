@@ -142,7 +142,7 @@ Data Platform team building AI monitoring and explainability infrastructure.
 </span>
 </h3>
 
-**Jun 2020 - Sept 2020 Palo Alto, CA (Remote)**
+**Jun 2020 - Sept 2020 · Palo Alto, CA (Remote)**
 
 Trust & Safety startup (co-founded by ex-Google VP); built foundational platform
 infrastructure.
