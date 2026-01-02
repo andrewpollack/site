@@ -42,6 +42,22 @@
   --code-accent: rgba(157, 123, 255, 0.80);
 }
 
+.role {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.role-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  object-fit: contain;   /* better for logos than cover */
+  flex: 0 0 auto;
+  transform: translateY(1px); /* tiny baseline nudge */
+  opacity: 0.95;
+}
+
 .site-header {
   display: flex;
   align-items: baseline;
