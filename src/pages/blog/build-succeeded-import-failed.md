@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/PostLayout.astro
 title:
-  'When “Build Succeeded” Lies: Debugging a glibc Mismatch in Python Wheels'
+  'Build Succeeded, Import Failed: Debugging a glibc Mismatch in Python Wheels'
 date: "January 1, 2026"
 ---
 
