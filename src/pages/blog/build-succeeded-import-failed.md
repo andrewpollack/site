@@ -1,47 +1,33 @@
 ---
 layout: ../../layouts/PostLayout.astro
 title:
-  'Build Succeeded, Import Failed: Debugging a glibc Mismatch in Python Wheels'
+  "Build Succeeded, Import Failed: Debugging a glibc Mismatch in Python Wheels"
 date: "January 1, 2026"
 ---
 
-One of my core responsibilities at [Anyscale](https://www.anyscale.com/) is to
-help build and distribute the [ray](https://pypi.org/project/ray) and
-[ray-cpp](https://pypi.org/project/ray-cpp) Python wheels for the open source
-project
-[https://github.com/ray-project/ray](https://github.com/ray-project/ray).
+This post is a debug log of an issue I ran into while packaging Python wheels
+for [ray](https://pypi.org/project/ray) and
+[ray-cpp](https://pypi.org/project/ray-cpp) in the open source
+[Ray project](https://github.com/ray-project/ray).
 
-This post is a debug log of an issue I hit while refactoring the wheel build
-flow. After the refactor, I produced a wheel that built and installed cleanly,
-but failed at import time. This never shipped to users, but it's a great example
-of how these failures happen and how to add guardrails to catch them early.
-
-<!-- ## TL;DR
-
-- **Symptom:** Wheel installs fine, but `import` fails at runtime (e.g.
-  `GLIBC_2.xx not found`, or `undefined symbol` errors).
-- **Cause:** The wheel packaging step _silently fell back_ to using (or
-  rebuilding) a native extension from the wrong environment.
-- **Fastest proof:** Verify what you actually packaged into the wheel:
-  `unzip -p ray-*.whl "ray/_raylet.so" > /tmp/raylet.so && objdump -p /tmp/raylet.so | grep GLIBC | sort -u`.
-  If the max GLIBC version is above your manylinux baseline (e.g. 2.17 for
-  manylinux2014), the wheel will fail on older systems.
-- **Root cause in my case:** A path bug copied cached artifacts into
-  `python/ray/ray/` instead of `python/ray/`, so `python/ray/_raylet.so` wasn't
-  overwritten and a newer local artifact leaked into the Docker context.
-- **Fix:** Correct the copy path and add a CI guardrail that fails the build if
-  the wheel's native extensions require GLIBC newer than your baseline.
-- **Takeaway:** "Build succeeded" does _not_ mean "compatible wheel shipped." -->
+After a build-system refactor, I ended up with a wheel file that built and
+installed cleanly but failed at import time in a fresh environment. Below is a
+walkthrough, plus the guardrails that keep this class of failure from slipping
+through again.
 
 **Quick Definitions:**
 
 - A **native extension** is code (in our case, C++) added to a higher-level
-  language (Python) to run performance-critical code (C/C++) behind a Python
-  API.
+  language (Python) to run performance-critical code behind a Python API.
 - A **Python wheel** (`.whl` file) is the standard built-package format for
   distributing Python libraries and applications. It's basically a ZIP archive
   containing all the files necessary for installation, including pre-compiled
   binary components for packages that require them.
+- **`glibc`** / **GLIBC_2.xx**: `glibc` is the system C library for many Linux
+  distros (it comes from the OS, not the wheel). The GLIBC_2.xx strings seen in
+  errors are symbol version requirements embedded in a compiled `.so`. Loading
+  the `.so` on system’s glibc is older than required, loading the `.so` (often
+  at import time) fails.
 
 ## Background
 
@@ -61,8 +47,8 @@ In practice, the wheel build has to answer a few non-negotiable questions:
 - **CI efficiency:** Can we reuse expensive C++ outputs instead of recompiling
   repeatedly?
 
-Before the refactor, Ray's wheel build was orchestrated by a Python script that runs
-inside a container:
+Before the refactor, Ray's wheel build was orchestrated by a Python script that
+runs inside a container:
 [builder_container.py](https://github.com/ray-project/ray/blob/efb34a676b05da643cf6733c765564757c76c206/ci/ray_ci/builder_container.py#L25-L44).
 
 This containerized flow improves reproducibility, but it has two real tradeoffs:
@@ -70,11 +56,10 @@ This containerized flow improves reproducibility, but it has two real tradeoffs:
 - It's harder to run and iterate on locally.
 - It's easy to miss caching opportunities, especially for large C++ builds.
 
-One of my first projects was to refactor the wheel build to reuse C++ artifacts
-produced earlier in CI, so they're built once and then shared across the wheel
-build _and_ other downstream jobs. This also makes local wheel builds easier,
-because you can pull the same cached artifacts instead of recompiling
-everything.
+I recently refactored the wheel build to reuse C++ artifacts produced earlier in
+CI, so they're built once and then shared across the wheel build _and_ other
+downstream jobs. This also makes local wheel builds easier, because you can pull
+the same cached artifacts instead of recompiling everything.
 
 ```text
 [C++ builder]  ---> produces: bazel-bin/**, .so, headers, etc. (cacheable)
@@ -321,8 +306,8 @@ fi
   verify what binary you actually packaged.
 - "Build succeeded" doesn't mean "wheel is compatible." Native code can be
   rebuilt during packaging without obvious red flags unless you add checks.
-- glibc ceiling is the fastest compatibility signal. Bake checks for this
-  into the build process.
+- glibc ceiling is the fastest compatibility signal. Bake checks for this into
+  the build process.
 
 ## Minimal repro: demonstrating the glibc trap in Docker
 
