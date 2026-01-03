@@ -1,53 +1,15 @@
 ---
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import "../styles/style.css";
+import BaseLayout from "./BaseLayout.astro";
 
 const { title = "Andrew Pollack-Gray", description } = Astro.props;
 
 const pageDesc =
   description ??
   "Build systems, infrastructure, CI/CD, and developer productivity.";
-
-const ogImage = new URL("/assets/images/og.png", Astro.site).toString();
-const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
-
-    <title>{title}</title>
-    <meta name="description" content={pageDesc} />
-    <link rel="canonical" href={canonical} />
-
-    <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={pageDesc} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={pageDesc} />
-    <meta name="twitter:image" content={ogImage} />
-  </head>
-
-  <body>
-    <Header />
-    <main id="main" class="resume">
-      <section>
-        <slot />
-      </section>
-    </main>
-    <Footer />
-  </body>
-</html>
+<BaseLayout title={title} description={pageDesc} mainClass="resume">
+  <section>
+    <slot />
+  </section>
+</BaseLayout>

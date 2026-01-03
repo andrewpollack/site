@@ -1,12 +1,9 @@
 ---
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import "../styles/style.css";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
 const modules = import.meta.glob("./blog/*.md", { eager: true });
 const posts = Object.values(modules);
 
-// Sort newest first (date string in frontmatter.date)
 posts.sort(
   (a, b) =>
     new Date((b as any).frontmatter.date).getTime() -
@@ -14,120 +11,78 @@ posts.sort(
 );
 
 const latest = posts[0];
-
-const title = "Andrew Pollack-Gray";
-const description =
-  "Build systems, infrastructure, CI/CD, and the invisible mechanics of developer productivity.";
-
-const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = new URL("/assets/images/og.png", Astro.site).toString();
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+<BaseLayout>
+  <section class="about">
+    <h2>😸 About Andrew</h2>
 
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <div class="about-grid">
+      <figure class="about-photo">
+        <img
+          src="/assets/images/andrew.jpg"
+          alt="Photo of Andrew sitting on a bench"
+          width="420"
+          height="560"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
 
-    <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-  </head>
-
-  <body>
-    <Header />
-
-    <main id="main">
-      <section class="about">
-        <h2>😸 About Andrew</h2>
-
-        <div class="about-grid">
-          <figure class="about-photo">
-            <img
-              src="/assets/images/andrew.jpg"
-              alt="Photo of Andrew sitting on a bench"
-              width="420"
-              height="560"
-              loading="eager"
-              decoding="async"
-            />
-          </figure>
-
-          <div class="about-text">
-            <p>
-              Hello, I’m Andrew Pollack-Gray! I like the parts of software that
-              make everything else possible: build systems, infrastructure,
-              CI/CD, and the invisible mechanics of developer productivity.
-            </p>
-
-            <p>
-              I'm currently working at
-              <a href="https://www.anyscale.com/">Anyscale</a>
-              as part of the Release and Engineering Efficiency (REEf) team.
-            </p>
-
-            <p>
-              Outside of work, I play the Euphonium and try to get better at
-              cooking. I also love to tinker with personal automations on a
-              <a
-                href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#pi-infrastructure"
-              >
-                Raspberry Pi cluster
-              </a>.
-              My favorite is a series of
-              <a
-                href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#meals-go--meals-frontend/"
-              >
-                grocery list automations
-              </a>
-              that my wife and I use all the time. This type of automation
-              brings me endless joy.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <hr />
-
-      <section>
-        <h2>Blog</h2>
+      <div class="about-text">
         <p>
-          A collection of insights and lessons learned from both personal
-          projects and professional experience.
+          Hello, I'm Andrew Pollack-Gray! I like the parts of software that
+          make everything else possible: build systems, infrastructure,
+          CI/CD, and the invisible mechanics of developer productivity.
         </p>
 
-        {latest ? (
-          <>
-            <h3>
-              <a href={(latest as any).url}>
-                {(latest as any).frontmatter.title}
-              </a>
-            </h3>
-            <h4>{(latest as any).frontmatter.date}</h4>
-          </>
-        ) : (
-          <p>No posts yet.</p>
-        )}
-      </section>
-    </main>
+        <p>
+          I'm currently working at
+          <a href="https://www.anyscale.com/">Anyscale</a>
+          as part of the Release and Engineering Efficiency (REEf) team.
+        </p>
 
-    <Footer />
-  </body>
-</html>
+        <p>
+          Outside of work, I play the Euphonium and try to get better at
+          cooking. I also love to tinker with personal automations on a
+          <a
+            href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#pi-infrastructure"
+          >
+            Raspberry Pi cluster
+          </a>.
+          My favorite is a series of
+          <a
+            href="https://github.com/andrewpollack/pi-infrastructure?tab=readme-ov-file#meals-go--meals-frontend/"
+          >
+            grocery list automations
+          </a>
+          that my wife and I use all the time. This type of automation
+          brings me endless joy.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr />
+
+  <section>
+    <h2>Blog</h2>
+    <p>
+      A collection of insights and lessons learned from both personal
+      projects and professional experience.
+    </p>
+
+    {latest ? (
+      <>
+        <h3>
+          <a href={(latest as any).url}>
+            {(latest as any).frontmatter.title}
+          </a>
+        </h3>
+        <h4>{(latest as any).frontmatter.date}</h4>
+      </>
+    ) : (
+      <p>No posts yet.</p>
+    )}
+  </section>
+</BaseLayout>
