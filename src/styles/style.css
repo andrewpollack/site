@@ -41,6 +41,26 @@
 }
 
 /* -------------------------
+   Skip link (accessibility)
+   ------------------------- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: var(--background-color);
+  font-weight: 700;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* -------------------------
    Base layout
    ------------------------- */
 html,
