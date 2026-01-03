@@ -3,6 +3,7 @@ layout: ../../layouts/PostLayout.astro
 title:
   "Build succeeded, import failed: debugging a glibc mismatch in Python wheels"
 date: "January 1, 2026"
+description: "A debug log of a wheel that built and installed cleanly but failed at import time due to a glibc mismatch, plus guardrails to prevent it."
 ---
 
 This post is a debug log of an issue I ran into while packaging Python wheels
