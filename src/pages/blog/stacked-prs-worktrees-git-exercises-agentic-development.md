@@ -246,8 +246,7 @@ Stacked PRs. In Revup:
 [foo]   <- PR 1: Topic=foo
    |
    v
-[bar]   <- PR 2: Topic=bar, Relative=foo
-```
+[bar]   <- PR 2: Topic=bar, Relative=foo</div>
 
 This dependency chain lets us reason about how changes flow between PRs.
 
