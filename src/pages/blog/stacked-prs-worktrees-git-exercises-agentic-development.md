@@ -240,8 +240,7 @@ Stacked PRs. In Revup:
 
 **Example** stack:
 
-```txt
-[main]
+<div class="diagram">[main]
    |
    v
 [foo]   <- PR 1: Topic=foo
