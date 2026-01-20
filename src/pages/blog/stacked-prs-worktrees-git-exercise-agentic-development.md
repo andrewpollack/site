@@ -1,6 +1,6 @@
 ---
 layout: ../../layouts/PostLayout.astro
-title: "Stacked PRs, Worktrees, and Git Exercises for Agentic Development"
+title: "Stacked PRs, Worktrees, and Git Exercise for Agentic Development"
 date: "January 20, 2026"
 description:
   "Highlighting some recent 'aha' moments I've had while learning to effectively
