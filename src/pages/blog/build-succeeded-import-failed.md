@@ -3,18 +3,20 @@ layout: ../../layouts/PostLayout.astro
 title:
   "Build succeeded, import failed: debugging a glibc mismatch in Python wheels"
 date: "January 1, 2026"
-description: "A debug log of a wheel that built and installed cleanly but failed at import time due to a glibc mismatch, plus guardrails to prevent it."
+description:
+  "A debug log of a wheel that built and installed cleanly but failed at import
+  time due to a glibc mismatch, plus guardrails to prevent it."
+toc: true
+intro: '<p>This post is a debug log of an issue I ran into while packaging
+  Python wheels for <a href="https://pypi.org/project/ray">ray</a> and <a
+  href="https://pypi.org/project/ray-cpp">ray-cpp</a> in the open source <a
+  href="https://github.com/ray-project/ray">Ray project</a>.</p>
+
+  <p>After a build-system refactor, I ended up with a wheel file that built and
+  installed cleanly but failed at import time in a fresh environment. Below is a
+  walkthrough, plus the guardrails that keep this class of failure from slipping
+  through again.</p>'
 ---
-
-This post is a debug log of an issue I ran into while packaging Python wheels
-for [ray](https://pypi.org/project/ray) and
-[ray-cpp](https://pypi.org/project/ray-cpp) in the open source
-[Ray project](https://github.com/ray-project/ray).
-
-After a build-system refactor, I ended up with a wheel file that built and
-installed cleanly but failed at import time in a fresh environment. Below is a
-walkthrough, plus the guardrails that keep this class of failure from slipping
-through again.
 
 **Quick Definitions:**
 
@@ -27,7 +29,7 @@ through again.
 - **`glibc`** / **GLIBC_2.xx**: `glibc` is the system C library on many Linux
   distros (it comes from the OS, not the wheel). The `GLIBC_2.xx` strings in
   errors are **symbol-version requirements** embedded in a compiled `.so`. If
-  the system’s `glibc` is older than required, loading the `.so` (often at
+  the system's `glibc` is older than required, loading the `.so` (often at
   import time) fails.
 
 ## Background

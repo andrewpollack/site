@@ -79,7 +79,7 @@ body {
 
 body {
   font-size: 16.5px;
-  line-height: 1.75;
+  line-height: 1.8;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -231,13 +231,36 @@ h4 {
   color: var(--accent);
 }
 
+/* Heading anchor links */
+h2 > a,
+h3 > a,
+h4 > a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+h2 > a:hover,
+h3 > a:hover,
+h4 > a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: none;
+  transform: none;
+}
+
 h1 {
   line-height: 1.2;
 }
 
 h2 {
-  margin-bottom: 6px;
+  margin-top: 48px;
+  margin-bottom: 16px;
   line-height: 1.25;
+}
+
+section > h2:first-child {
+  margin-top: 0;
 }
 
 h3 {
@@ -253,7 +276,7 @@ h4 {
 
 p {
   margin-top: 0;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   color: var(--body-text);
 }
 
@@ -275,6 +298,18 @@ hr {
   border: none;
   height: 1px;
   margin: 28px 0;
+}
+
+/* Blockquotes */
+blockquote {
+  margin: 18px 0;
+  padding: 0 0 0 20px;
+  border-left: 3px solid var(--accent);
+  color: var(--muted-text);
+}
+
+blockquote p {
+  margin: 0;
 }
 
 /* Links (content links) */
@@ -365,6 +400,19 @@ a:focus-visible {
 }
 
 /* -------------------------
+   Blog images
+   ------------------------- */
+main img:not(.role-icon) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 24px auto;
+  border-radius: 12px;
+  border: 1px solid rgba(199, 182, 255, 0.18);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.30);
+}
+
+/* -------------------------
    Code blocks + inline code
    ------------------------- */
 pre ::selection {
@@ -430,7 +478,8 @@ li code,
 h1 code,
 h2 code,
 h3 code,
-h4 code {
+h4 code,
+.intro code {
   padding: 0.15em 0.4em;
   border-radius: 6px;
   background: rgba(110, 231, 183, 0.10);
@@ -438,6 +487,57 @@ h4 code {
   color: var(--code-green);
   font-size: 0.95em;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Copy button */
+.code-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(207, 250, 229, 0.70);
+  background: rgba(110, 231, 183, 0.08);
+  border: 1px solid rgba(110, 231, 183, 0.18);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  z-index: 2;
+}
+
+.code-copy-btn:hover {
+  background: rgba(110, 231, 183, 0.18);
+  border-color: rgba(110, 231, 183, 0.30);
+  color: rgba(207, 250, 229, 0.95);
+}
+
+.code-copy-btn:active {
+  transform: scale(0.94);
+}
+
+.code-copy-btn.copied {
+  color: var(--code-green);
+  background: rgba(110, 231, 183, 0.22);
+  border-color: rgba(110, 231, 183, 0.40);
+}
+
+.code-copy-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Shift language label left when copy button present */
+pre:has(.code-copy-btn) code[class^="language-"]::before {
+  right: 52px;
 }
 
 /* Scrollbars (WebKit) */
@@ -707,6 +807,70 @@ main details.callout {
 details.callout[open] > summary {
   padding-bottom: 0.6rem;
   border-bottom: 1px solid rgba(110, 231, 183, 0.14);
+}
+
+/* -------------------------
+   Table of contents
+   ------------------------- */
+.intro {
+  margin-bottom: 24px;
+}
+
+.toc {
+  margin: 24px 0 32px;
+}
+
+.toc strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted-text);
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.toc ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.toc li {
+  margin: 6px 0;
+}
+
+.toc a {
+  font-weight: 500;
+}
+
+.toc .toc-sub {
+  margin-left: 1rem;
+}
+
+/* -------------------------
+   Aha moment callouts
+   ------------------------- */
+/* Light diagram/tree blocks */
+.diagram {
+  margin: 18px 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.95em;
+  line-height: 1.5;
+  color: var(--muted-text);
+  white-space: pre;
+}
+
+.aha {
+  margin: 24px 0;
+  padding: 0 0 0 20px;
+  border-left: 3px solid var(--accent);
+}
+
+.aha strong {
+  color: var(--accent-strong);
+}
+
+.aha p {
+  margin: 0;
 }
 
 /* -------------------------

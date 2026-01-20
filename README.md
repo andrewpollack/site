@@ -19,4 +19,3 @@ npm run build
 
 Deployed to Cloudflare Pages on push to `main`. Cloudflare is instructed to run
 `npm run build`, with ouput directory as `dist/`.
-

@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import { execSync } from 'child_process';
 
 import sitemap from "@astrojs/sitemap";
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 function getCommitHash() {
   // Cloudflare Pages provides this env var
@@ -21,6 +23,12 @@ export default defineConfig({
   site: "https://andrewpollack.dev",
   trailingSlash: "always",
   integrations: [sitemap()],
+  markdown: {
+    rehypePlugins: [
+      rehypeSlug,
+      [rehypeAutolinkHeadings, { behavior: 'wrap' }],
+    ],
+  },
   vite: {
     define: {
       __COMMIT_HASH__: JSON.stringify(getCommitHash()),

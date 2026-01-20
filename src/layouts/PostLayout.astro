@@ -1,13 +1,17 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 
-const { frontmatter } = Astro.props;
-const { title, date, description } = frontmatter ?? {};
+const { frontmatter, headings } = Astro.props;
+const { title, date, description, toc, intro } = frontmatter ?? {};
 
 const pageTitle = title ?? "Andrew Pollack-Gray";
 const pageDesc =
   description ??
   "Build systems, infrastructure, CI/CD, and developer productivity.";
+
+// Filter to h2 and h3 for TOC
+const tocHeadings = headings?.filter((h: { depth: number }) => h.depth >= 2 && h.depth <= 3) ?? [];
+const showToc = toc && tocHeadings.length > 0;
 ---
 
 <BaseLayout title={pageTitle} description={pageDesc} ogType="article">
@@ -15,6 +19,101 @@ const pageDesc =
     <h2>{pageTitle}</h2>
     {date && <h4>{date}</h4>}
     <hr />
+    {intro && <div class="intro" set:html={intro} />}
+    {showToc && (
+      <nav class="toc">
+        <strong>Contents</strong>
+        <ul>
+          {tocHeadings.map((heading: { depth: number; slug: string; text: string }) => (
+            <li class={heading.depth === 3 ? "toc-sub" : ""}>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
     <slot />
   </section>
+
+  <div id="lightbox" class="lightbox">
+    <img src="" alt="" />
+  </div>
+
+  <style>
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      cursor: zoom-out;
+      align-items: center;
+      justify-content: center;
+    }
+    .lightbox.open {
+      display: flex;
+    }
+    .lightbox img {
+      max-width: 95vw;
+      max-height: 95vh;
+      border-radius: 8px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+    section :global(img) {
+      cursor: zoom-in;
+    }
+  </style>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox?.querySelector('img');
+
+    document.querySelectorAll('section img').forEach(img => {
+      img.addEventListener('click', () => {
+        if (lightboxImg) {
+          lightboxImg.src = img.src;
+          lightboxImg.alt = img.alt;
+        }
+        lightbox?.classList.add('open');
+      });
+    });
+
+    lightbox?.addEventListener('click', () => {
+      lightbox.classList.remove('open');
+    });
+
+    // Add copy buttons to code blocks
+    const copyIcon = `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const checkIcon = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+    document.querySelectorAll('pre').forEach(pre => {
+      const btn = document.createElement('button');
+      btn.className = 'code-copy-btn';
+      btn.innerHTML = copyIcon;
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'Copy code to clipboard');
+
+      btn.addEventListener('click', async () => {
+        const code = pre.querySelector('code');
+        const text = code?.textContent ?? '';
+
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.innerHTML = checkIcon;
+          btn.classList.add('copied');
+
+          setTimeout(() => {
+            btn.innerHTML = copyIcon;
+            btn.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          setTimeout(() => {
+            btn.innerHTML = copyIcon;
+          }, 2000);
+        }
+      });
+
+      pre.appendChild(btn);
+    });
+  </script>
 </BaseLayout>
