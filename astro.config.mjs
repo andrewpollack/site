@@ -22,7 +22,14 @@ function getCommitHash() {
 export default defineConfig({
   site: "https://andrewpollack.dev",
   trailingSlash: "always",
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      serialize(item) {
+        item.lastmod = new Date();
+        return item;
+      },
+    }),
+  ],
   markdown: {
     rehypePlugins: [
       rehypeSlug,
