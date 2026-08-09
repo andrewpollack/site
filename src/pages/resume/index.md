@@ -37,7 +37,22 @@ collaboration.
   <span>Anyscale — Software Engineer</span>
 </h3>
 
-**Dec 2025 – Present · San Francisco, CA**
+**Dec 2025 – May 2026 · San Francisco, CA**
+
+- Owned Ray build and release infrastructure across Bazel, Buildkite CI,
+  container images, wheel packaging, release engineering, and Terraform-managed
+  artifact infrastructure.
+- Reduced wheel and container-image build times from ~1 hour to under 3 minutes
+  on cache hits via content-addressed caching and Docker layer optimization.
+- Led Bazel 6.5 to 7.5 migration across Linux and macOS, resolving toolchain,
+  dependency, and remote-cache reliability issues.
+- Extended the CI pipeline system with dependency-aware execution graphs and
+  multi-stage artifact sharing, enabling semantic pruning of matrix-expanded
+  execution steps (165 → 12 in common cases).
+- Delivered reproducible local wheel and image builds matching CI, improving
+  debugging and workflow consistency.
+- Built Go-based quality gate system enforcing coverage thresholds, repository
+  standards, and PR validation across Ray CI.
 
 <h3 class="role">
   <img class="role-icon" src="/assets/images/skydio.png" alt="Skydio logo" />
