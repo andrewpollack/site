@@ -21,7 +21,7 @@ function getCommitHash() {
 
 export default defineConfig({
   site: "https://andrewpollack.dev",
-  trailingSlash: "always",
+  trailingSlash: "ignore",
   integrations: [
     sitemap({
       serialize(item) {
